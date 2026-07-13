@@ -1,0 +1,49 @@
+
+#The innovation society
+
+par A=3,s=1,d=0.5,al=0.5,be=0.05
+par tr=0,depon=1,gentime=10
+par dn=0.2, phi=0.1
+
+#Note - time is rescaled by the intrinsic growth rate, r.  All time
+#parameters are relative to r.
+
+#power  function clipped at 0
+pow(x,a) = if(x>0)then(x**a)else(0)
+
+#intrinsic growth funtion with possbile threshold. Rate scaled out
+#see above.
+
+gr(x,t) = tanh(20*(x-t))
+
+#economic/industrial ouput.  K=0, society can revert to backstop
+#technology
+
+Y = N*(1+A*pow(K/N,al))*R
+
+#Births = bo + bv*Y, deaths = do - dv*Y so growth = births - deaths = bo-do + bv*Y + dv*Y, so, dn = do-bo, phi = bv+dv
+
+#dynamics of the built and natural infrastructure and population
+
+dK/dt = s*Y- d*K
+dR/dt = depon*gr(R,tr)*R*(1-R) + (1-depon)*R*(1-R) - be*Y
+dN/dt = -dn*N + phi*Y
+
+# So... the parameter r rears its head.  If we define shat=s/r, we need to back out s
+# to be able to calculate some sort of wellbeing, i.e. c=(1-s)Y. So then s=shat*r.
+# then the output to investment is shat*r*Y and consumption, C = (1-shat*r)*Y.
+# hmmm.....
+
+init K=0,R=1,N=0.1
+aux O = Y
+aux PCO = Y/N
+aux tscale=s*gentime*t
+
+@ total=200, xlo=0, xhi=1.2, ylo=0, yhi=10,xp=R,yp=K
+@ nmesh=200, bounds=5000
+
+done
+
+Notes:  This is a race between s, be, and A.  Interesting balance to get the overshoot dynamics. Withouth some kind of threshold, Need to simultaneously innovate on A going up and be going down.
+
+Note - the time scale is arbitrary - need to think about it.
